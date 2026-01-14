@@ -1,0 +1,11 @@
+edge-tts
+pydub
+pandas
+seaborn
+matplotlib
+jiwer
+psutil
+faster-whisper
+whisperx
+torch
+pyannote.audio

@@ -1,0 +1,20 @@
+# System files
+.DS_Store
+
+# Virtual Environments
+.venv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.pyc
+
+# Dependencies
+# whisper.cpp is a separate repo that should be cloned by the user
+whisper.cpp/
+
+# Generated Data
+dataset/
+graphs/
+benchmark_results.csv
