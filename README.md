@@ -1,9 +1,18 @@
-# STT Benchmarking on MacBook Air M3
+# STT Benchmarking 
 
 This project benchmarks three state-of-the-art ASR models on Apple Silicon (M3):
 - **Faster-Whisper** (CTranslate2 optimized)
 - **WhisperX** (Pytorch/MPS)
 - **whisper.cpp** (CoreML/Metal/Arm Neon)
+
+## Project Scope
+
+This repository contains code for two types of benchmarking:
+
+1.  **Offline Benchmarking** (`offline_benchmark/`): Batch processing of pre-generated audio files to measure raw performance metrics (WER, RTF, Latency).
+2.  **Real-time Benchmarking** (`realtime_benchmark/`): Testing the models in a simulated streaming environment.
+
+> **Note:** For this specific report, we are primarily focusing on the **Offline Benchmarking** results. The scripts and instructions below specifically target the generation and analysis of the offline benchmark data.
 
 ## Prerequisites
 
