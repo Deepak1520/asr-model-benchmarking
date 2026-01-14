@@ -1,52 +1,42 @@
 import os
-import time
 from faster_whisper import WhisperModel
 import whisperx
 import torch
 
-TEST_FILE = "dataset/clean_0.wav"
+# quick check script
+TEST_WAV = "dataset/clean_0.wav"
 
-def test_faster_whisper():
-    print("Testing Faster-Whisper...")
+def check_dependencies():
+    print("Checking dependencies...")
+    
+    # Faster Whisper
     try:
-        model = WhisperModel("tiny", device="cpu", compute_type="int8") # Use tiny for quick test
-        # Note: Benchmark uses large-v2. This confirms library works.
-        
-        if os.path.exists(TEST_FILE):
-             segments, info = model.transcribe(TEST_FILE, beam_size=1)
-             print("Faster-Whisper Transcription:", " ".join([s.text for s in segments]).strip())
-        else:
-             print("Test file not found, skipping transcription.")
+        print("Loading Faster-Whisper...")
+        m = WhisperModel("tiny", device="cpu", compute_type="int8")
+        if os.path.exists(TEST_WAV):
+            m.transcribe(TEST_WAV)
         print("Faster-Whisper OK")
     except Exception as e:
-        print(f"Faster-Whisper FAILED: {e}")
+        print(f"Faster-Whisper Error: {e}")
 
-def test_whisperx():
-    print("Testing WhisperX...")
+    # WhisperX
     try:
+        print("Loading WhisperX...")
         try:
-            from omegaconf import listconfig
+            # torch fix
             import torch.serialization
-            torch.serialization.add_safe_globals([listconfig.ListConfig])
-        except:
-             pass
+            import omegaconf
+            torch.serialization.add_safe_globals([omegaconf.listconfig.ListConfig])
+        except: pass
         
-        device = "mps" if torch.backends.mps.is_available() else "cpu"
-        print(f"WhisperX Device: {device}")
-        # load model
-        model = whisperx.load_model("tiny", device=device, compute_type="float16" if device=="mps" else "int8")
-        
-        if os.path.exists(TEST_FILE):
-            audio = whisperx.load_audio(TEST_FILE)
-            result = model.transcribe(audio, batch_size=4)
-            print("WhisperX Transcription:", " ".join([s['text'] for s in result['segments']]).strip())
-        print("WhisperX OK")
+        dev = "mps" if torch.backends.mps.is_available() else "cpu"
+        m = whisperx.load_model("tiny", dev, compute_type="int8")
+        if os.path.exists(TEST_WAV):
+             audio = whisperx.load_audio(TEST_WAV)
+             m.transcribe(audio)
+        print(f"WhisperX OK (device={dev})")
     except Exception as e:
-        print(f"WhisperX FAILED: {e}")
+        print(f"WhisperX Error: {e}")
 
 if __name__ == "__main__":
-    if not os.path.exists(TEST_FILE):
-        print(f"Warning: {TEST_FILE} not found. Ensure dataset is generated.")
-    
-    test_faster_whisper()
-    test_whisperx()
+    check_dependencies()
