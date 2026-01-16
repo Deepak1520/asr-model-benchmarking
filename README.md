@@ -1,105 +1,63 @@
-# STT Benchmarking 
+# ASR Model Benchmarking
 
-This project benchmarks three state-of-the-art ASR models on Apple Silicon (M3):
-- **Faster-Whisper** (CTranslate2 optimized)
-- **WhisperX** (Pytorch/MPS)
-- **whisper.cpp** (CoreML/Metal/Arm Neon)
+A comprehensive benchmarking suite for comparing Automatic Speech Recognition (ASR) models on Apple Silicon (M3).
 
-## Project Scope
+## Supported Models
+- **Faster-Whisper**: Optimized Transformer implementation.
+- **WhisperX**: Features accurate timestamping and diarization.
+- **Whisper.cpp**: High-performance C++ inference (CoreML/Metal support).
 
-This repository contains code for two types of benchmarking:
-
-1.  **Offline Benchmarking** (`offline_benchmark/`): Batch processing of pre-generated audio files to measure raw performance metrics (WER, RTF, Latency).
-2.  **Real-time Benchmarking** (`realtime_benchmark/`): Testing the models in a simulated streaming environment.
-
-> **Note:** For this specific report, we are primarily focusing on the **Offline Benchmarking** results. The scripts and instructions below specifically target the generation and analysis of the offline benchmark data.
-
-## Prerequisites
-
-- macOS (tested on Sonoma/Sequoia)
-- python 3.10+
-- `ffmpeg` (required for pydub/audio processing)
-
-## Installation
-
-1.  **Dependencies**
-    ```bash
-    pip install edge-tts pydub faster-whisper jiwer pandas seaborn matplotlib torch torchaudio
-    pip install git+https://github.com/m-bain/whisperx.git
-    ```
-
-2.  **Compile whisper.cpp**
-    The project expects `whisper.cpp` to be present in the root directory.
-    ```bash
-    git clone https://github.com/ggerganov/whisper.cpp
-    cd whisper.cpp
-    
-    # Compile with Metal (GPU) support
-    make clean
-    WHISPER_METAL=1 make -j
-    
-    # Download Model
-    bash ./models/download-ggml-model.sh large-v2
-    cd ..
-    ```
-
-## Running the Benchmark
-
-1.  **Generate Dataset**
-    Generate synthetic dataset (Clean, Noisy, Accented):
-    ```bash
-    python3 generate_dataset.py
-    ```
-
-2.  **Run Benchmark**
-   ## Directory Structure
-- `scripts/`: Python scripts for benchmarking and visualization.
-- `graphs/`: Generated performance charts.
-- `dataset/`: Generated audio samples (Clean, Noisy, Accented).
-- `whisper.cpp/`: Cloned repository and build files.
-- `benchmark_results.csv`: Raw metrics.
-
-## Running the Benchmark
-
-### 1. Generate Dataset
-```bash
-python3 scripts/generate_dataset.py
-```
-
-### 2. Run Benchmarks
-Run each model independently:
-```bash
-# Faster-Whisper
-python3 scripts/benchmark_fw.py
-
-# WhisperX
-python3 scripts/benchmark_wx.py
-
-# whisper.cpp
-python3 scripts/benchmark_cpp.py
-```
-Note: Ensure you are in the root directory (`try report`).
-
-### 3. Visualize Results
-Generate charts in `graphs/`:
-```bash
-python3 scripts/visualize_results.py
+## Project Structure
 ```
 .
-
-## CMAKE_ARGS for whisper.cpp (if using CMake)
-
-If you prefer CMake or if directly using `pip install whisper-cpp-python` (not used here, we use binary), you would use:
-```bash
-CMAKE_ARGS="-DWHISPER_METAL=ON -DWHISPER_CoreML=OFF" pip install whisper-cpp-python
-```
-For manual build:
-```bash
-cmake -B build -DWHISPER_METAL=ON
-cmake --build build --config Release
+├── src/                # Source code
+│   ├── offline/        # Offline benchmarking scripts
+│   └── realtime/       # Real-time FastAPI demo
+├── scripts/            # Utility scripts
+├── data/               # Datasets and Results
+│   ├── dataset/        # Audio files (Clean, Noisy, Accented)
+│   └── results/        # Benchmark CSVs and Graphs
+└── requirements.txt    # Python dependencies
 ```
 
-## Optimization Notes
-- **Faster-Whisper**: Uses CTranslate2. On M-series, `int8` quantization on CPU is often fastest and most stable.
-- **WhisperX**: Uses PyTorch `mps` backend for acceleration.
-- **whisper.cpp**: Uses pure Metal/C++ implementation for high efficiency.
+## Setup
+
+1. **Install Dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+   *Note: `whisperx` may require installation from GitHub.*
+
+2. **Whisper.cpp Setup**
+   Clone and build `whisper.cpp` in the project root:
+   ```bash
+   git clone https://github.com/ggerganov/whisper.cpp.git
+   cd whisper.cpp
+   make
+   ./models/download-ggml-model.sh large-v2
+   ```
+
+## Usage
+
+### Offline Benchmarking
+Run benchmarks for individual models:
+```bash
+python src/offline/benchmark_fw.py   # Run Faster-Whisper
+python src/offline/benchmark_cpp.py  # Run Whisper.cpp
+```
+
+Generate graphs and summary tables:
+```bash
+python src/offline/visualize.py
+```
+Results will be saved to `data/results/`.
+
+### Real-time Demo
+Launch the web interface:
+```bash
+uvicorn src.realtime.app:app --reload
+```
+Open `http://127.0.0.1:8000` to transcribe audio files with real-time metrics.
+
+## License
+MIT

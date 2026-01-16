@@ -1,20 +1,24 @@
-# System files
-.DS_Store
-
-# Virtual Environments
+# Python
+__pycache__/
+*.pyc
 .venv/
 venv/
 env/
 
-# Python
-__pycache__/
-*.pyc
+# System
+.DS_Store
 
-# Dependencies
-# whisper.cpp is a separate repo that should be cloned by the user
+# Data
+data/dataset/
+data/transcriptions/
+data/results/graphs/
+# Keep summaries and CSVs if desired, or ignore them too:
+# data/results/*.csv
+
+# Whisper.cpp
 whisper.cpp/
 
-# Generated Data
-dataset/
-graphs/
-benchmark_results.csv
+# Temporary
+temp_*.wav
+temp_in_*
+*.log

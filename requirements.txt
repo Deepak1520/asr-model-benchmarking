@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+python-multipart
+jinja2
+pandas
+seaborn
+matplotlib
+jiwer
+psutil
+pydub
+faster-whisper
+# whisperx (Optional, often installed via git)
+# git+https://github.com/m-bain/whisperx.git
